@@ -336,8 +336,8 @@ export default function Home() {
 
               {/* Tap to reveal */}
               {showTapToReveal && (
-                <div className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/20 animate-bounce">
-                  <div className="text-7xl mb-6">🎁</div>
+                <div className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/20 animate-gacha-shake">
+                  <div className="text-7xl mb-6 animate-gacha-shake-icon">🎁</div>
                   <h3 className="text-2xl font-bold mb-4 text-[#F4C542]">SELAMAT!</h3>
                   <p className="text-gray-400 mb-8 text-lg">
                     Hasil kelulusan Anda sudah siap
@@ -530,6 +530,54 @@ export default function Home() {
           }
         }
 
+        @keyframes gacha-shake {
+          0%, 100% {
+            transform: rotate(0deg) translateX(0);
+          }
+          10% {
+            transform: rotate(-5deg) translateX(-10px);
+          }
+          20% {
+            transform: rotate(5deg) translateX(10px);
+          }
+          30% {
+            transform: rotate(-5deg) translateX(-10px);
+          }
+          40% {
+            transform: rotate(5deg) translateX(10px);
+          }
+          50% {
+            transform: rotate(-3deg) translateX(-5px);
+          }
+          60% {
+            transform: rotate(3deg) translateX(5px);
+          }
+          70% {
+            transform: rotate(-2deg) translateX(-3px);
+          }
+          80% {
+            transform: rotate(2deg) translateX(3px);
+          }
+          90% {
+            transform: rotate(-1deg) translateX(-1px);
+          }
+        }
+
+        @keyframes gacha-shake-icon {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          25% {
+            transform: rotate(-15deg);
+          }
+          50% {
+            transform: rotate(15deg);
+          }
+          75% {
+            transform: rotate(-10deg);
+          }
+        }
+
         .animate-fade-in {
           animation: fade-in 0.8s ease-out;
         }
@@ -560,6 +608,14 @@ export default function Home() {
 
         .animate-neon-text {
           animation: neon-text 2s ease-in-out infinite;
+        }
+
+        .animate-gacha-shake {
+          animation: gacha-shake 2s ease-in-out infinite;
+        }
+
+        .animate-gacha-shake-icon {
+          animation: gacha-shake-icon 1.5s ease-in-out infinite;
         }
 
         html {
