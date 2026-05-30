@@ -62,14 +62,14 @@ export default function Home() {
   })
   const [celebrate, setCelebrate] = useState(false)
 
-  // Countdown timer - target: June 2, 2025 at 2:00 PM WIB (Asia/Jakarta timezone)
+  // Countdown timer - target: June 2, 2026 at 2:00 PM WIB (Asia/Jakarta timezone)
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date()
       setCurrentTime(now)
 
       // Create target date in WIB (UTC+7)
-      const targetYear = 2025
+      const targetYear = 2026
       const targetMonth = 5 // June (0-indexed)
       const targetDay = 2
       const targetHour = 14 // 2 PM
@@ -249,7 +249,7 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p className="text-sm">
-                      2 Juni 2025, 14:00 WIB
+                      2 Juni 2026, 14:00 WIB
                     </p>
                   </div>
                 </div>
@@ -281,11 +281,46 @@ export default function Home() {
 
           {!isAnnouncementOpen ? (
             <div className="bg-black/60 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/20 animate-fade-in">
-              <div className="text-7xl mb-6">🔒</div>
-              <h3 className="text-2xl font-bold mb-3 text-[#F4C542]">PENGUMUMAN BELUM DIBUKA</h3>
-              <p className="text-gray-400">
-                Silakan tunggu hingga 2 Juni 2025, pukul 14:00 WIB
-              </p>
+              {/* Countdown timer near search bar */}
+              <div className="mb-6">
+                <div className="text-5xl mb-4">⏰</div>
+                <h3 className="text-xl font-bold mb-2 text-[#F4C542]">PENGUMUMAN AKAN DIBUKA DALAM:</h3>
+                <div className="grid grid-cols-4 gap-3 md:gap-4 max-w-2xl mx-auto">
+                  {[
+                    { value: timeLeft.days, label: 'HARI' },
+                    { value: timeLeft.hours, label: 'JAM' },
+                    { value: timeLeft.minutes, label: 'MENIT' },
+                    { value: timeLeft.seconds, label: 'DETIK' }
+                  ].map((item) => (
+                    <div key={item.label} className="relative">
+                      <div className="relative bg-gradient-to-br from-[#1a1500] to-[#0a0a0a] rounded-2xl p-3 md:p-4 text-center border border-[#F4C542]/30">
+                        <span className="text-2xl md:text-4xl font-black text-[#F4C542] block animate-neon-text" style={{ textShadow: '0 0 15px rgba(244, 197, 66, 0.5)' }}>
+                          {String(item.value).padStart(2, '0')}
+                        </span>
+                        <span className="text-xs md:text-sm font-bold text-gray-500 tracking-wider">
+                          {item.label}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center justify-center gap-2 text-gray-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm">
+                    2 Juni 2026, 14:00 WIB
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-[#F4C542]/20 pt-6">
+                <div className="text-7xl mb-6">🔒</div>
+                <h3 className="text-2xl font-bold mb-3 text-[#F4C542]">SEARCH BAR MASIH TERKUNCI</h3>
+                <p className="text-gray-400">
+                  Search bar akan aktif setelah countdown selesai
+                </p>
+              </div>
             </div>
           ) : (
             <div className="space-y-8">
