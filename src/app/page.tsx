@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 // Student data for all classes
 const studentData = {
@@ -42,9 +42,6 @@ const studentData = {
   ]
 }
 
-// Countdown target date: June 2, 2:00 PM WIB (Asia/Jakarta)
-const targetDate = new Date('2025-06-02T14:00:00+07:00')
-
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false)
@@ -66,35 +63,54 @@ export default function Home() {
 
   // Particle generation
   useEffect(() => {
-    const newParticles = Array.from({ length: 20 }, (_, i) => ({
+    const newParticles = Array.from({ length: 30 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 10 + 5,
-      duration: Math.random() * 3 + 2
+      size: Math.random() * 15 + 5,
+      duration: Math.random() * 4 + 3
     }))
     setParticles(newParticles)
   }, [])
 
-  // Countdown timer
+  // Countdown timer - target: June 2, 2025 at 2:00 PM WIB (Asia/Jakarta timezone)
   useEffect(() => {
-    const interval = setInterval(() => {
+    const calculateTimeLeft = () => {
       const now = new Date()
       setCurrentTime(now)
+
+      // Create target date in WIB (UTC+7)
+      const targetYear = 2025
+      const targetMonth = 5 // June (0-indexed)
+      const targetDay = 2
+      const targetHour = 14 // 2 PM
+      const targetMinute = 0
+      const targetSecond = 0
+
+      // Create date in WIB timezone
+      const targetDate = new Date(Date.UTC(targetYear, targetMonth, targetDay, targetHour - 7, targetMinute, targetSecond))
+
       const diff = targetDate.getTime() - now.getTime()
 
       if (diff <= 0) {
         setIsAnnouncementOpen(true)
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
-        clearInterval(interval)
-      } else {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-        setTimeLeft({ days, hours, minutes, seconds })
+        return
       }
-    }, 1000)
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+      setTimeLeft({ days, hours, minutes, seconds })
+    }
+
+    // Initial calculation
+    calculateTimeLeft()
+
+    // Update every second
+    const interval = setInterval(calculateTimeLeft, 1000)
 
     return () => clearInterval(interval)
   }, [])
@@ -173,83 +189,109 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF9E6] to-white text-[#1A1A1A]">
-      {/* Floating particles background */}
+    <div className="min-h-screen bg-[#0a0a0a] text-[#1A1A1A]">
+      {/* Dark background with gradient */}
+      <div className="fixed inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#1a1500] to-[#0a0a0a] z-0"></div>
+
+      {/* Neon particle background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         {particles.map((particle) => (
           <div
             key={particle.id}
-            className="absolute rounded-full opacity-20"
+            className="absolute rounded-full animate-neon-particle"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
               width: `${particle.size}px`,
               height: `${particle.size}px`,
               backgroundColor: '#F4C542',
-              animation: `float ${particle.duration}s ease-in-out infinite`
+              boxShadow: `0 0 ${particle.size * 2}px #F4C542, 0 0 ${particle.size * 4}px #FFD95A`,
+              animationDuration: `${particle.duration}s`
             }}
           />
         ))}
       </div>
 
+      {/* Grid pattern overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-10">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(rgba(244, 197, 66, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(244, 197, 66, 0.1) 1px, transparent 1px)',
+          backgroundSize: '50px 50px'
+        }}></div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
         <div className="text-center max-w-4xl mx-auto space-y-8 animate-fade-in">
-          {/* School badge decoration */}
-          <div className="mx-auto w-24 h-24 rounded-full bg-gradient-to-br from-[#F4C542] to-[#FFD95A] flex items-center justify-center shadow-lg animate-bounce-slow">
-            <span className="text-4xl font-bold text-white">🎓</span>
+          {/* School badge with neon glow */}
+          <div className="mx-auto w-28 h-28 rounded-full bg-gradient-to-br from-[#F4C542] to-[#FFD95A] flex items-center justify-center animate-neon-glow">
+            <span className="text-5xl font-bold text-black">🎓</span>
           </div>
 
-          {/* Main title */}
+          {/* Main title with neon effect */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight animate-slide-up">
-            <span className="block text-[#F4C542]">PENGUMUMAN</span>
-            <span className="block text-[#1A1A1A]">KELULUSAN</span>
+            <span className="block text-[#F4C542] animate-neon-text">PENGUMUMAN</span>
+            <span className="block text-white animate-neon-text" style={{ animationDelay: '0.2s' }}>KELULUSAN</span>
           </h1>
 
           {/* Subtitle */}
-          <div className="space-y-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <p className="text-xl md:text-2xl font-semibold text-[#1A1A1A]">
+          <div className="space-y-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <p className="text-xl md:text-2xl font-bold text-[#F4C542] animate-neon-text">
               SMP SWASTA RK MAKMUR / BUDIMURNI-4
             </p>
-            <p className="text-lg text-gray-600">Tahun Ajaran 2025/2026</p>
+            <p className="text-lg text-gray-400">Tahun Ajaran 2025/2026</p>
           </div>
 
           {/* Countdown */}
           {!isAnnouncementOpen ? (
             <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 max-w-2xl mx-auto">
-                <p className="text-sm md:text-base text-gray-600 mb-4 font-medium">
-                  Pengumuman akan dibuka dalam:
-                </p>
-                <div className="grid grid-cols-4 gap-3 md:gap-4">
-                  {[
-                    { value: timeLeft.days, label: 'Hari' },
-                    { value: timeLeft.hours, label: 'Jam' },
-                    { value: timeLeft.minutes, label: 'Menit' },
-                    { value: timeLeft.seconds, label: 'Detik' }
-                  ].map((item) => (
-                    <div key={item.label} className="bg-gradient-to-br from-[#F4C542] to-[#FFD95A] rounded-xl p-3 md:p-4 text-center">
-                      <span className="text-2xl md:text-4xl font-black text-white block">
-                        {String(item.value).padStart(2, '0')}
-                      </span>
-                      <span className="text-xs md:text-sm font-medium text-white/90">
-                        {item.label}
-                      </span>
-                    </div>
-                  ))}
+              <div className="relative">
+                {/* Neon glow behind countdown */}
+                <div className="absolute inset-0 bg-[#F4C542]/20 blur-3xl rounded-3xl"></div>
+
+                <div className="relative bg-black/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 max-w-2xl mx-auto border border-[#F4C542]/30 shadow-2xl">
+                  <p className="text-sm md:text-base text-gray-400 mb-6 font-medium tracking-wider">
+                    PENGUMUMAN AKAN DIBUKA DALAM:
+                  </p>
+                  <div className="grid grid-cols-4 gap-3 md:gap-4">
+                    {[
+                      { value: timeLeft.days, label: 'HARI' },
+                      { value: timeLeft.hours, label: 'JAM' },
+                      { value: timeLeft.minutes, label: 'MENIT' },
+                      { value: timeLeft.seconds, label: 'DETIK' }
+                    ].map((item) => (
+                      <div key={item.label} className="relative group">
+                        {/* Neon glow effect */}
+                        <div className="absolute inset-0 bg-[#F4C542] blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <div className="relative bg-gradient-to-br from-[#1a1500] to-[#0a0a0a] rounded-2xl p-4 md:p-5 text-center border-2 border-[#F4C542]/50">
+                          <span className="text-3xl md:text-5xl font-black text-[#F4C542] block animate-neon-text" style={{ textShadow: '0 0 20px #F4C542, 0 0 40px #FFD95A' }}>
+                            {String(item.value).padStart(2, '0')}
+                          </span>
+                          <span className="text-xs md:text-sm font-bold text-gray-500 tracking-wider">
+                            {item.label}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex items-center justify-center gap-2 text-gray-500">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm">
+                      2 Juni 2025, 14:00 WIB
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs md:text-sm text-gray-500 mt-4">
-                  2 Juni 2025, 14:00 WIB
-                </p>
               </div>
             </div>
           ) : (
             <button
               onClick={scrollToSection}
-              className="animate-slide-up px-8 py-4 bg-gradient-to-r from-[#F4C542] to-[#FFD95A] text-[#1A1A1A] font-bold text-lg rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="animate-slide-up px-10 py-5 bg-gradient-to-r from-[#F4C542] to-[#FFD95A] text-black font-bold text-xl rounded-2xl animate-neon-glow hover:scale-105 transition-all duration-300"
               style={{ animationDelay: '0.4s' }}
             >
-              Lihat Pengumuman →
+              LIHAT PENGUMUMAN →
             </button>
           )}
         </div>
@@ -259,51 +301,51 @@ export default function Home() {
       <section id="announcement" className="relative z-10 py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] animate-fade-in">
-              Cek Hasil Kelulusan
+            <h2 className="text-3xl md:text-4xl font-bold text-[#F4C542] animate-fade-in" style={{ textShadow: '0 0 30px rgba(244, 197, 66, 0.5)' }}>
+              CEK HASIL KELULUSAN
             </h2>
-            <p className="text-gray-600 animate-fade-in">
+            <p className="text-gray-400 animate-fade-in">
               Masukkan nama lengkap Anda untuk melihat hasil
             </p>
           </div>
 
           {!isAnnouncementOpen ? (
-            <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h3 className="text-xl font-bold mb-2">Pengumuman Belum Dibuka</h3>
-              <p className="text-gray-600">
+            <div className="bg-black/80 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/30 shadow-2xl animate-fade-in">
+              <div className="text-7xl mb-6">🔒</div>
+              <h3 className="text-2xl font-bold mb-3 text-[#F4C542]">PENGUMUMAN BELUM DIBUKA</h3>
+              <p className="text-gray-400">
                 Silakan tunggu hingga 2 Juni 2025, pukul 14:00 WIB
               </p>
             </div>
           ) : (
             <div className="space-y-8">
               {/* Search form */}
-              <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-xl p-6 md:p-8 animate-fade-in">
+              <form onSubmit={handleSearch} className="bg-black/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-[#F4C542]/30 shadow-2xl animate-fade-in">
                 <div className="flex flex-col md:flex-row gap-4">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Masukkan nama lengkap Anda..."
-                    className="flex-1 px-6 py-4 rounded-xl border-2 border-[#F4C542] focus:outline-none focus:border-[#FFD95A] text-lg transition-colors"
+                    className="flex-1 px-6 py-4 rounded-2xl bg-black/50 border-2 border-[#F4C542]/50 focus:outline-none focus:border-[#F4C542] text-lg text-white placeholder-gray-500 transition-all focus:shadow-[0_0_20px_rgba(244,197,66,0.3)]"
                     disabled={isSearching}
                   />
                   <button
                     type="submit"
                     disabled={isSearching || !searchQuery.trim()}
-                    className="px-8 py-4 bg-gradient-to-r from-[#F4C542] to-[#FFD95A] text-[#1A1A1A] font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="px-8 py-4 bg-gradient-to-r from-[#F4C542] to-[#FFD95A] text-black font-bold rounded-2xl animate-neon-glow hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    {isSearching ? 'Mencari...' : 'Cek Hasil'}
+                    {isSearching ? 'MENCARI...' : 'CEK HASIL'}
                   </button>
                 </div>
               </form>
 
               {/* Loading state */}
               {isSearching && (
-                <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-pulse">
-                  <div className="text-6xl mb-4 animate-spin">🎰</div>
-                  <h3 className="text-xl font-bold mb-2">Sedang Memeriksa...</h3>
-                  <p className="text-gray-600">
+                <div className="bg-black/80 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/30 shadow-2xl animate-pulse">
+                  <div className="text-7xl mb-6 animate-spin">🎰</div>
+                  <h3 className="text-2xl font-bold mb-3 text-[#F4C542]">SEDANG MEMERIKSA...</h3>
+                  <p className="text-gray-400">
                     Memproses data kelulusan Anda
                   </p>
                 </div>
@@ -311,11 +353,11 @@ export default function Home() {
 
               {/* Random result animation */}
               {showRandomResult && randomResult && (
-                <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-shake">
-                  <div className="text-6xl mb-4">🎲</div>
-                  <h3 className="text-2xl font-bold mb-4">{randomResult.name}</h3>
-                  <div className={`text-3xl md:text-5xl font-black px-6 py-4 rounded-xl inline-block ${
-                    randomResult.status === 'LULUS' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                <div className="bg-black/80 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/30 shadow-2xl animate-shake">
+                  <div className="text-7xl mb-6">🎲</div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">{randomResult.name}</h3>
+                  <div className={`text-4xl md:text-6xl font-black px-6 py-4 rounded-2xl inline-block ${
+                    randomResult.status === 'LULUS' ? 'bg-green-500/20 text-green-400 border-2 border-green-500' : 'bg-red-500/20 text-red-400 border-2 border-red-500'
                   }`}>
                     {randomResult.status}
                   </div>
@@ -324,15 +366,15 @@ export default function Home() {
 
               {/* Tap to reveal */}
               {showTapToReveal && (
-                <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-bounce">
-                  <div className="text-6xl mb-4">🎁</div>
-                  <h3 className="text-2xl font-bold mb-4">Selamat!</h3>
-                  <p className="text-gray-600 mb-6">
+                <div className="bg-black/80 backdrop-blur-xl rounded-3xl p-8 text-center border border-[#F4C542]/30 shadow-2xl animate-bounce">
+                  <div className="text-7xl mb-6">🎁</div>
+                  <h3 className="text-2xl font-bold mb-4 text-[#F4C542]">SELAMAT!</h3>
+                  <p className="text-gray-400 mb-8 text-lg">
                     Hasil kelulusan Anda sudah siap
                   </p>
                   <button
                     onClick={handleTapToReveal}
-                    className="px-12 py-4 bg-gradient-to-r from-[#F4C542] to-[#FFD95A] text-[#1A1A1A] font-bold text-xl rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    className="px-12 py-5 bg-gradient-to-r from-[#F4C542] to-[#FFD95A] text-black font-bold text-xl rounded-2xl animate-neon-glow hover:scale-105 transition-all duration-300"
                   >
                     TAP UNTUK MELIHAT HASIL
                   </button>
@@ -341,7 +383,7 @@ export default function Home() {
 
               {/* Final result */}
               {showFinalResult && searchResult && (
-                <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-slide-up">
+                <div className="bg-black/80 backdrop-blur-xl rounded-3xl p-8 text-center border-2 border-[#F4C542] shadow-2xl animate-slide-up relative overflow-hidden">
                   {celebrate && (
                     <div className="fixed inset-0 pointer-events-none z-50">
                       {Array.from({ length: 50 }).map((_, i) => (
@@ -361,25 +403,30 @@ export default function Home() {
                     </div>
                   )}
 
-                  <div className="text-6xl mb-4 animate-bounce">🎊</div>
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                    {searchResult.className}
-                  </h3>
-                  <h2 className="text-2xl md:text-3xl font-black mb-6">
-                    {searchResult.name}
-                  </h2>
-                  <div className="bg-gradient-to-r from-green-400 to-green-600 text-white text-4xl md:text-6xl font-black px-8 py-6 rounded-2xl inline-block shadow-lg animate-scale-up">
-                    LULUS
-                  </div>
-                  <p className="text-gray-600 mt-6 text-lg">
-                    Selamat! Anda berhasil lulus dan melanjutkan ke jenjang berikutnya.
-                  </p>
-                  <div className="mt-8 flex justify-center gap-4">
-                    {['🎉', '🎓', '✨', '🌟', '🎊'].map((emoji, i) => (
-                      <span key={i} className="text-4xl animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}>
-                        {emoji}
-                      </span>
-                    ))}
+                  {/* Neon glow background */}
+                  <div className="absolute inset-0 bg-[#F4C542]/10 blur-3xl"></div>
+
+                  <div className="relative">
+                    <div className="text-7xl mb-6 animate-bounce">🎊</div>
+                    <h3 className="text-xl font-semibold text-[#F4C542] mb-2">
+                      {searchResult.className}
+                    </h3>
+                    <h2 className="text-2xl md:text-3xl font-black mb-6 text-white">
+                      {searchResult.name}
+                    </h2>
+                    <div className="bg-gradient-to-r from-green-400 to-green-600 text-black text-4xl md:text-6xl font-black px-8 py-6 rounded-2xl inline-block animate-neon-glow">
+                      LULUS
+                    </div>
+                    <p className="text-gray-300 mt-6 text-lg">
+                      Selamat! Anda berhasil lulus dan melanjutkan ke jenjang berikutnya.
+                    </p>
+                    <div className="mt-8 flex justify-center gap-4">
+                      {['🎉', '🎓', '✨', '🌟', '🎊'].map((emoji, i) => (
+                        <span key={i} className="text-4xl animate-bounce" style={{ animationDelay: `${i * 0.1}s` }}>
+                          {emoji}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -389,25 +436,16 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 bg-[#F4C542] text-[#1A1A1A] py-6 mt-auto">
+      <footer className="relative z-10 bg-black/80 backdrop-blur-xl text-[#F4C542] py-6 mt-auto border-t border-[#F4C542]/30">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="font-semibold">© 2025 SMP SWASTA RK MAKMUR / BUDIMURNI-4</p>
-          <p className="text-sm text-[#1A1A1A]/80 mt-1">
+          <p className="font-bold">© 2025 SMP SWASTA RK MAKMUR / BUDIMURNI-4</p>
+          <p className="text-sm text-gray-500 mt-1">
             Selamat kepada semua siswa yang telah menyelesaikan pendidikan
           </p>
         </div>
       </footer>
 
       <style jsx global>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(180deg);
-          }
-        }
-
         @keyframes fade-in {
           from {
             opacity: 0;
@@ -471,6 +509,35 @@ export default function Home() {
           }
         }
 
+        @keyframes neon-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(244, 197, 66, 0.5), 0 0 40px rgba(244, 197, 66, 0.3), 0 0 60px rgba(244, 197, 66, 0.1);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(244, 197, 66, 0.7), 0 0 60px rgba(244, 197, 66, 0.5), 0 0 90px rgba(244, 197, 66, 0.3);
+          }
+        }
+
+        @keyframes neon-text {
+          0%, 100% {
+            text-shadow: 0 0 10px rgba(244, 197, 66, 0.8), 0 0 20px rgba(244, 197, 66, 0.6), 0 0 30px rgba(244, 197, 66, 0.4);
+          }
+          50% {
+            text-shadow: 0 0 20px rgba(244, 197, 66, 1), 0 0 40px rgba(244, 197, 66, 0.8), 0 0 60px rgba(244, 197, 66, 0.6);
+          }
+        }
+
+        @keyframes neon-particle {
+          0%, 100% {
+            transform: translateY(0) scale(1);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateY(-20px) scale(1.2);
+            opacity: 1;
+          }
+        }
+
         .animate-fade-in {
           animation: fade-in 0.8s ease-out;
         }
@@ -495,8 +562,24 @@ export default function Home() {
           animation: confetti 4s ease-out forwards;
         }
 
+        .animate-neon-glow {
+          animation: neon-glow 2s ease-in-out infinite;
+        }
+
+        .animate-neon-text {
+          animation: neon-text 2s ease-in-out infinite;
+        }
+
+        .animate-neon-particle {
+          animation: neon-particle 3s ease-in-out infinite;
+        }
+
         html {
           scroll-behavior: smooth;
+        }
+
+        body {
+          background-color: #0a0a0a;
         }
       `}</style>
     </div>
