@@ -52,6 +52,8 @@ export default function Home() {
   const [randomResult, setRandomResult] = useState<{ name: string; status: string } | null>(null)
   const [showFinalResult, setShowFinalResult] = useState(false)
   const [showTapToReveal, setShowTapToReveal] = useState(false)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -108,7 +110,8 @@ export default function Home() {
     const trimmedQuery = searchQuery.trim().toLowerCase()
 
     if (!trimmedQuery) {
-      alert('Silakan masukkan nama lengkap Anda')
+      setErrorMessage('Silakan masukkan nama lengkap Anda')
+      setShowErrorModal(true)
       return
     }
 
@@ -134,7 +137,8 @@ export default function Home() {
 
     if (!foundStudent) {
       setIsSearching(false)
-      alert('Nama tidak ditemukan. Silakan periksa kembali nama lengkap Anda.')
+      setErrorMessage('Masukkan nama dengan benar!')
+      setShowErrorModal(true)
       return
     }
 
@@ -410,6 +414,39 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowErrorModal(false)}
+          ></div>
+
+          {/* Modal content */}
+          <div className="relative bg-black/90 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full border-2 border-red-500 animate-scale-up shadow-2xl">
+            {/* Error icon */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/20 mb-4 animate-pulse">
+                <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">NAMA TIDAK DITEMUKAN</h3>
+              <p className="text-gray-300 text-lg">{errorMessage}</p>
+            </div>
+
+            {/* Close button */}
+            <button
+              onClick={() => setShowErrorModal(false)}
+              className="w-full px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold text-lg rounded-2xl hover:scale-105 transition-all duration-300"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         @keyframes fade-in {
